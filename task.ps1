@@ -10,7 +10,6 @@ $dbSubnetIpRange = "10.20.30.64/26"
 $mngSubnetName = "management"
 $mngSubnetIpRange = "10.20.30.128/26"
 
-
 Write-Host "Creating a resource group $resourceGroupName ..."
 New-AzResourceGroup -Name $resourceGroupName -Location $location
 
@@ -23,8 +22,8 @@ $mngrule = New-AzNetworkSecurityRuleConfig -Name mng-rule -Description "Allow SS
 $mngNSG = New-AzNetworkSecurityGroup -Name "$mngSubnetName" -ResourceGroupName "$resourceGroupName" -Location "$location" -SecurityRules $mngrule
 
 Write-Host "Creating dbSubnet network security group..."
-$dbNSG = New-AzNetworkSecurityGroup -Name "$dbSubnetName" -ResourceGroupName "$resourceGroupName" -Location "$location"
-
+$dbrule = New-AzNetworkSecurityRuleConfig -Name db-rule -Description "Deny any traffic from the Internet" -Access Deny -Protocol * -Direction Inbound -Priority 100 -SourceAddressPrefix Internet -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange *
+$dbNSG = New-AzNetworkSecurityGroup -Name "$dbSubnetName" -ResourceGroupName "$resourceGroupName" -Location "$location" -SecurityRules $dbrule
 
 Write-Host "Creating a virtual network ..."
 $webSubnet = New-AzVirtualNetworkSubnetConfig -Name $webSubnetName -AddressPrefix $webSubnetIpRange -NetworkSecurityGroup $webNSG
